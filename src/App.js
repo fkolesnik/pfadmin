@@ -1,24 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import {useSnapshot} from "valtio";
+import {userStore} from "./store/user.store";
+import {Route, Routes} from "react-router-dom";
+import {Container} from "@chakra-ui/react";
+import Nav from "./components/Nav";
+import Login from "./pages/login/Login";
+import Queries from "./pages/queries/Queries";
+import Users from "./pages/users/Users";
+import {useAutoLogin} from "./pages/login/hooks/useAutoLogin";
+import SpinnerGlobal from "./components/SpinnerGlobal";
+import Empty from "./components/Empty";
 
-function App() {
+const App = () => {
+  const {user, isAutoLoginLoading} = useSnapshot(userStore);
+
+  useAutoLogin();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container maxW='container.xl' py={5}>
+      {!user && !isAutoLoginLoading && <Login/>}
+
+      {isAutoLoginLoading && <SpinnerGlobal/>}
+
+      {user &&
+        <>
+          <Nav/>
+          <Routes>
+            <Route path='/' exact element={<Queries/>}/>
+            <Route path='/users' element={<Users/>}/>
+            <Route path='*' element={<Empty/>}/>
+          </Routes>
+        </>
+      }
+    </Container>
   );
 }
 
